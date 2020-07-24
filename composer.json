@@ -1,0 +1,16 @@
+{
+    "name": "stavarengo/async-microservice-communication",
+    "type": "project",
+    "config": {
+        "sort-packages": true
+    },
+    "authors": [
+        {
+            "name": "Stavarengo",
+            "email": "faelsta@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4"
+    }
+}
