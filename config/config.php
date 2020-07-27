@@ -22,6 +22,9 @@ return (function () {
                     ConfigAggregator::CACHE_FILEMODE => 0660,
                 ]
             ),
+
+            \AMC\Broker\ConfigProvider::class,
+
             new PhpFileProvider(__DIR__ . '/config/autoload/{{,*.}global,{,*.}local}.php'),
         ],
         $cacheFile
