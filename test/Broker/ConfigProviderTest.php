@@ -9,6 +9,7 @@ use AMC\Broker\ConfigProvider;
 use AMC\Broker\Factory\PDOFactory;
 use AMC\Broker\Persistence\IDGeneratorInterface;
 use AMC\Broker\Persistence\PersistenceInterface;
+use AMC\Broker\RequestHandler\PostHandler;
 use PHPUnit\Framework\TestCase;
 
 class ConfigProviderTest extends TestCase
@@ -26,11 +27,12 @@ class ConfigProviderTest extends TestCase
 
         $config = $configProvider->getContainerDefinitions();
 
-        $this->assertCount(3, $config);
+        $this->assertCount(4, $config);
 
         $this->assertArrayHasKey(\PDO::class, $config);
         $this->assertArrayHasKey(PersistenceInterface::class, $config);
         $this->assertArrayHasKey(IDGeneratorInterface::class, $config);
+        $this->assertArrayHasKey(PostHandler::class, $config);
     }
 
     public function testDispatcherConfig()

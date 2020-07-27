@@ -25,11 +25,37 @@ require __DIR__ . '/../vendor/autoload.php';
         $response = $fibonacci_rpc->call('Hi, ');
         echo ' [.] Got ', $response, "\n";
     } elseif ($type == 'broker') {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            (new \AMC\Broker\PostHandler())->__invoke();
-        } else {
-            (new \AMC\Broker\GetHandler())->__invoke();
+        try {
+            /** @var \AMC\Broker\RequestHandler\RequestHandlerInterface $requestHandler */
+            $requestHandler = null;
+
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                $requestHandler = $container->get(\AMC\Broker\RequestHandler\PostHandler::class);
+            }
+
+            if ($requestHandler) {
+                $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+                $response = $requestHandler->handleIt($request);
+            } else {
+                $response = new \GuzzleHttp\Psr7\Response(
+                    404,
+                    ['Content-Type' => 'text/html; charset=UTF-8'],
+                    \GuzzleHttp\Psr7\stream_for('Not found!')
+                );
+            }
+        } catch (\Throwable $e) {
+            $response = new \GuzzleHttp\Psr7\Response(
+                500,
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+                \GuzzleHttp\Psr7\stream_for(sprintf("Server error!\n\n%s", $e))
+            );
         }
+
+        http_response_code($response->getStatusCode());
+        foreach ($response->getHeaders() as $headerName => $hederValue) {
+            header(sprintf('%s: %s', $headerName, $response->getHeaderLine($headerName)));
+        }
+        echo $response->getBody()->getContents();
     }
 })(
     $argv ?? [1 => 'broker']

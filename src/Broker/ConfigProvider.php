@@ -21,6 +21,8 @@ class ConfigProvider
 
             Persistence\PersistenceInterface::class => \DI\autowire(Persistence\Postgres::class),
             Persistence\IDGeneratorInterface::class => \DI\autowire(Persistence\IDGenerator::class),
+
+            RequestHandler\PostHandler::class => \DI\autowire(RequestHandler\PostHandler::class),
         ];
     }
 
