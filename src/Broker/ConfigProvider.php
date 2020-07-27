@@ -18,6 +18,9 @@ class ConfigProvider
     {
         return [
             \PDO::class => \DI\factory(Factory\PDOFactory::class),
+
+            Persistence\PersistenceInterface::class => \DI\autowire(Persistence\Postgres::class),
+            Persistence\IDGeneratorInterface::class => \DI\autowire(Persistence\IDGenerator::class),
         ];
     }
 
