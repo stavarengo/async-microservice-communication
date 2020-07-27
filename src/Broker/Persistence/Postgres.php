@@ -49,7 +49,7 @@ class Postgres implements PersistenceInterface
 
             $message = null;
 
-            if ($stmt->execute([$id]) && $fetchResult = $stmt->fetch()) {
+            if ($stmt->execute([$id]) && $fetchResult = $stmt->fetch(\PDO::FETCH_OBJ)) {
                 $message = new Message($fetchResult->id, $fetchResult->message);
             }
 
