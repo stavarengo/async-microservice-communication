@@ -25,6 +25,7 @@ return (function () {
             ),
 
             \AMC\Broker\ConfigProvider::class,
+            \AMC\ConsumerServices\ConfigProvider::class,
             \AMC\QueueSystem\ConfigProvider::class,
 
             new PhpFileProvider(__DIR__ . '/config/autoload/{{,*.}global,{,*.}local}.php'),
