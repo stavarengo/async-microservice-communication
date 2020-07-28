@@ -12,7 +12,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "AMC\\Broker\\": "src/Broker/"
+            "AMC\\Broker\\": "src/Broker/",
+            "AMC\\QueueSystem\\": "src/QueueSystem/"
         }
     },
     "require": {
