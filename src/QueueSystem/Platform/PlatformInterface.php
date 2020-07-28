@@ -7,7 +7,7 @@ namespace AMC\QueueSystem\Platform;
 
 
 use AMC\QueueSystem\Exception\FailedToPublishMessage;
-use AMC\QueueSystem\QueueMessageInterface;
+use AMC\QueueSystem\Message\QueueMessageInterface;
 
 interface PlatformInterface
 {

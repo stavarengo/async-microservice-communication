@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace AMC\QueueSystem\Exception;
 
 
-use AMC\QueueSystem\QueueMessageInterface;
+use AMC\QueueSystem\Message\QueueMessageInterface;
 use Exception;
 use Throwable;
 

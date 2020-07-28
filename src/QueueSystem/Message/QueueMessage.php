@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace AMC\QueueSystem;
+namespace AMC\QueueSystem\Message;
 
 
 class QueueMessage implements QueueMessageInterface

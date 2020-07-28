@@ -6,8 +6,8 @@ declare(strict_types=1);
 namespace AMC\QueueSystem\Platform\RabbitMQ;
 
 
+use AMC\QueueSystem\Message\QueueMessageInterface;
 use AMC\QueueSystem\Platform\PlatformInterface;
-use AMC\QueueSystem\QueueMessageInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Message\AMQPMessage;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AMC\Test\QueueSystem;
 
-use AMC\QueueSystem\QueueMessage;
+use AMC\QueueSystem\Message\QueueMessage;
 use PHPUnit\Framework\TestCase;
 
 class QueueMessageTest extends TestCase
