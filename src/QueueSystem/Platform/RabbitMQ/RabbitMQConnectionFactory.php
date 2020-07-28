@@ -6,9 +6,9 @@ declare(strict_types=1);
 namespace AMC\QueueSystem\Platform\RabbitMQ;
 
 
-use AMC\Broker\ConfigProvider;
-use AMC\Broker\Factory\Exception\MissingConfigEntry;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use AMC\QueueSystem\ConfigProvider;
+use AMC\QueueSystem\Platform\RabbitMQ\Exception\MissingConfigEntry;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 use Psr\Container\ContainerInterface;
 
 class RabbitMQConnectionFactory
@@ -36,7 +36,7 @@ class RabbitMQConnectionFactory
             }
         }
 
-        return new AMQPStreamConnection(
+        return new AMQPLazyConnection(
             $rabbitMQConfig[self::HOSTNAME],
             $rabbitMQConfig[self::PORT],
             $rabbitMQConfig[self::USERNAME],
