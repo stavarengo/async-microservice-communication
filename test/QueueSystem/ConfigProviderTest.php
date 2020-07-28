@@ -25,9 +25,10 @@ class ConfigProviderTest extends TestCase
 
         $config = $configProvider->getContainerDefinitions();
 
-        $this->assertCount(2, $config);
+        $this->assertCount(3, $config);
 
-        $this->assertArrayHasKey(PlatformInterface::class, $config);
+        $this->assertArrayHasKey(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A, $config);
+        $this->assertArrayHasKey(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_B, $config);
         $this->assertArrayHasKey(AbstractConnection::class, $config);
     }
 

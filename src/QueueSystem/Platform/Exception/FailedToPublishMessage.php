@@ -3,14 +3,13 @@
 declare(strict_types=1);
 
 
-namespace AMC\QueueSystem\Exception;
+namespace AMC\QueueSystem\Platform\Exception;
 
 
 use AMC\QueueSystem\Message\QueueMessageInterface;
-use Exception;
 use Throwable;
 
-class FailedToPublishMessage extends Exception
+class FailedToPublishMessage extends PlatformException
 {
     public static function create(QueueMessageInterface $message, Throwable $reason): self
     {

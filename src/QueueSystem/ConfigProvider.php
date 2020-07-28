@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AMC\QueueSystem;
 
+use AMC\QueueSystem\Platform\PlatformInterface;
 use PhpAmqpLib\Connection\AbstractConnection as RabbitMQConnection;
 
 use function DI\autowire;
@@ -24,8 +25,12 @@ class ConfigProvider
     public function getContainerDefinitions(): array
     {
         return [
-            Platform\PlatformInterface::class => autowire(Platform\RabbitMQ\RabbitMQPlatform::class),
             RabbitMQConnection::class => factory(Platform\RabbitMQ\RabbitMQConnectionFactory::class),
+
+            PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A => autowire(Platform\RabbitMQ\RabbitMQPlatform::class)
+                ->constructorParameter('queueName', 'topic-a'),
+            PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_B => autowire(Platform\RabbitMQ\RabbitMQPlatform::class)
+                ->constructorParameter('queueName', 'topic-b'),
         ];
     }
 

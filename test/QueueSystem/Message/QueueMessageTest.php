@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AMC\Test\QueueSystem;
+namespace AMC\Test\QueueSystem\Message;
 
 use AMC\QueueSystem\Message\QueueMessage;
 use PHPUnit\Framework\TestCase;

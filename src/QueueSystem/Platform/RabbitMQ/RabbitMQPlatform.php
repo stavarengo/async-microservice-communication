@@ -7,33 +7,42 @@ namespace AMC\QueueSystem\Platform\RabbitMQ;
 
 
 use AMC\QueueSystem\Message\QueueMessageInterface;
+use AMC\QueueSystem\Platform\Exception\FailedToConsumeQueue;
+use AMC\QueueSystem\Platform\Exception\FailedToPublishMessage;
 use AMC\QueueSystem\Platform\PlatformInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 
 class RabbitMQPlatform implements PlatformInterface
 {
     private AbstractConnection $rabbitConnection;
-    private AMQPChannel $channel;
+    private ?AMQPChannel $channel = null;
+    private string $queueName;
 
-    /**
-     * RabbitMQ constructor.
-     * @param AbstractConnection $rabbitConnection
-     */
-    public function __construct(AbstractConnection $rabbitConnection)
+    public function __construct(AbstractConnection $rabbitConnection, string $queueName)
     {
         $this->rabbitConnection = $rabbitConnection;
+        $this->queueName = $queueName;
     }
 
-    public function consume(string $queueName, callable $callback): void
+    public function consume(callable $callback): void
     {
-        $this->getChannel()->basic_consume($queueName, '', false, true, false, false, $callback);
+        try {
+            $this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, $callback);
+        } catch (Throwable $e) {
+            throw FailedToConsumeQueue::create($this->queueName, $e);
+        }
     }
 
-    public function publish(string $queueName, QueueMessageInterface $queueMessage): void
+    public function publish(QueueMessageInterface $queueMessage): void
     {
-        $this->getChannel()->basic_publish(new AMQPMessage($queueMessage), '', $queueName);
+        try {
+            $this->getChannel()->basic_publish(new AMQPMessage($queueMessage), '', $this->queueName);
+        } catch (Throwable $e) {
+            throw FailedToPublishMessage::create($queueMessage, $e);
+        }
     }
 
     /**

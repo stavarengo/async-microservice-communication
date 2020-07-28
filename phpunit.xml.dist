@@ -7,6 +7,9 @@
         <testsuite name="AMC Broker Module">
             <directory>./test/Broker</directory>
         </testsuite>
+        <testsuite name="AMC Queue System Module">
+            <directory>./test/QueueSystem</directory>
+        </testsuite>
     </testsuites>
 
     <filter>
