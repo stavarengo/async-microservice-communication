@@ -54,7 +54,7 @@ class RabbitMQPlatformTest extends TestCase
             ->with(
                 $this->callback(
                     function (AMQPMessage $AMQPMessage) use ($expectedMessage) {
-                        return $AMQPMessage->getBody() === $expectedMessage;
+                        return $AMQPMessage->getBody() === serialize($expectedMessage);
                     }
                 ),
                 $this->anything(),

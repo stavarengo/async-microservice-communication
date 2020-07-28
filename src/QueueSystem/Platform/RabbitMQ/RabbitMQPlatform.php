@@ -39,7 +39,7 @@ class RabbitMQPlatform implements PlatformInterface
     public function publish(QueueMessageInterface $queueMessage): void
     {
         try {
-            $this->getChannel()->basic_publish(new AMQPMessage($queueMessage), '', $this->queueName);
+            $this->getChannel()->basic_publish(new AMQPMessage(serialize($queueMessage)), '', $this->queueName);
         } catch (Throwable $e) {
             throw FailedToPublishMessage::create($queueMessage, $e);
         }
@@ -52,6 +52,13 @@ class RabbitMQPlatform implements PlatformInterface
     {
         if (!$this->channel) {
             $this->channel = $this->rabbitConnection->channel();
+            $this->channel->queue_declare(
+                $this->queueName,
+                false,
+                false,
+                false,
+                false
+            );
         }
 
         return $this->channel;

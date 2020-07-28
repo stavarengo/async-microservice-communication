@@ -38,9 +38,9 @@ class ConfigProvider
     {
         return [
             Platform\RabbitMQ\RabbitMQConnectionFactory::HOSTNAME => '127.0.0.1',
-            Platform\RabbitMQ\RabbitMQConnectionFactory::PORT => 5432,
-            Platform\RabbitMQ\RabbitMQConnectionFactory::USERNAME => 'postgres',
-            Platform\RabbitMQ\RabbitMQConnectionFactory::PASSWORD => 'root',
+            Platform\RabbitMQ\RabbitMQConnectionFactory::PORT => 5672,
+            Platform\RabbitMQ\RabbitMQConnectionFactory::USERNAME => 'guest',
+            Platform\RabbitMQ\RabbitMQConnectionFactory::PASSWORD => 'guest',
         ];
     }
 }

@@ -29,7 +29,7 @@ class ConfigProvider
             Persistence\PersistenceInterface::class => autowire(Persistence\Postgres::class),
             Persistence\IDGeneratorInterface::class => autowire(Persistence\IDGenerator::class),
 
-            RequestHandler\PostHandler::class => autowire(RequestHandler\PostHandler::class),
+            RequestHandler\PostHandler::class => factory(RequestHandler\PostHandlerFactory::class),
         ];
     }
 
