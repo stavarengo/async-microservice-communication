@@ -7,8 +7,11 @@ namespace AMC\Broker\Persistence;
 
 
 use AMC\Broker\Entity\Message;
+use AMC\Broker\Persistence\Exception\FailedToBeginTransaction;
+use AMC\Broker\Persistence\Exception\FailedToCommitTransaction;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
+use AMC\Broker\Persistence\Exception\FailedToRollbackTransaction;
 
 interface PersistenceInterface
 {
@@ -32,4 +35,21 @@ interface PersistenceInterface
      * @throws FailedToFetchRecord
      */
     public function get(string $id): ?Message;
+
+    /**
+     * @throws FailedToBeginTransaction
+     */
+    public function beginTransaction(): void;
+
+    /**
+     * @throws FailedToCommitTransaction
+     */
+    public function commit(): void;
+
+    /**
+     * @throws FailedToRollbackTransaction
+     */
+    public function rollBack(): void;
+
+    public function inTransaction(): bool;
 }

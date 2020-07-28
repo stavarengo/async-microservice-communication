@@ -7,8 +7,11 @@ namespace AMC\Broker\Persistence;
 
 
 use AMC\Broker\Entity\Message;
+use AMC\Broker\Persistence\Exception\FailedToBeginTransaction;
+use AMC\Broker\Persistence\Exception\FailedToCommitTransaction;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
+use AMC\Broker\Persistence\Exception\FailedToRollbackTransaction;
 use PDO;
 use Throwable;
 
@@ -61,5 +64,37 @@ class Postgres implements PersistenceInterface
         } catch (Throwable $e) {
             throw FailedToFetchRecord::create($id, $e);
         }
+    }
+
+    public function beginTransaction(): void
+    {
+        try {
+            $this->pdo->beginTransaction();
+        } catch (Throwable $e) {
+            throw FailedToBeginTransaction::create($e);
+        }
+    }
+
+    public function commit(): void
+    {
+        try {
+            $this->pdo->commit();
+        } catch (Throwable $e) {
+            throw FailedToCommitTransaction::create($e);
+        }
+    }
+
+    public function rollBack(): void
+    {
+        try {
+            $this->pdo->rollBack();
+        } catch (Throwable $e) {
+            throw FailedToRollbackTransaction::create($e);
+        }
+    }
+
+    public function inTransaction(): bool
+    {
+        return $this->pdo->inTransaction();
     }
 }

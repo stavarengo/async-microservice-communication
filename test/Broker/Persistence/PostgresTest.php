@@ -10,8 +10,11 @@ namespace AMC\Test\Broker\Persistence;
 
 
 use AMC\Broker\Entity\Message;
+use AMC\Broker\Persistence\Exception\FailedToBeginTransaction;
+use AMC\Broker\Persistence\Exception\FailedToCommitTransaction;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
+use AMC\Broker\Persistence\Exception\FailedToRollbackTransaction;
 use AMC\Broker\Persistence\Exception\PersistenceException;
 use AMC\Broker\Persistence\IDGeneratorInterface;
 use AMC\Broker\Persistence\Postgres;
@@ -19,10 +22,10 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PostgresTest extends TestCase
 {
-
     /**
      * @dataProvider dataProviderInsertRecordThrowException
      */
@@ -108,6 +111,40 @@ class PostgresTest extends TestCase
 
         $PDOStatementStub->method('fetch')->willReturn(false);
         $this->assertNull($persistence->get('id-123'));
+    }
+
+    /**
+     * @dataProvider dataProviderTransactionMethods
+     */
+    public function testTransactionMethods(string $transactionMethod, PersistenceException $expectedException): void
+    {
+        $pdo = $this->createMock(PDO::class);
+        $pdo->expects($this->once())->method($transactionMethod);
+        (new Postgres($pdo, $this->stubIDGenerator('1')))->$transactionMethod();
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->expects($this->once())
+            ->method($transactionMethod)
+            ->willThrowException($expectedException->getPrevious());
+        $this->expectExceptionObject($expectedException);
+        (new Postgres($pdo, $this->stubIDGenerator('1')))->$transactionMethod();
+    }
+
+    public function dataProviderTransactionMethods(): array
+    {
+        return [
+            ['beginTransaction', FailedToBeginTransaction::create(new RuntimeException('Test Begin Exception'))],
+            ['commit', FailedToCommitTransaction::create(new RuntimeException('Test Commit Exception'))],
+            ['rollback', FailedToRollbackTransaction::create(new RuntimeException('Test Rollback Exception'))],
+        ];
+    }
+
+    public function testInTransaction()
+    {
+        $pdo = $this->createMock(PDO::class);
+        $pdo->expects($this->once())->method('inTransaction')->willReturn(true);
+
+        $this->assertTrue((new Postgres($pdo, $this->stubIDGenerator('1')))->inTransaction());
     }
 
     private function stubIDGenerator(string $id)
