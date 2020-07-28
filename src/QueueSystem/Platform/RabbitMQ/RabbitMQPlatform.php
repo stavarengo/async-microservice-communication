@@ -30,9 +30,23 @@ class RabbitMQPlatform implements PlatformInterface
     public function consume(callable $callback): void
     {
         try {
-            $this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, $callback);
+            $this->getChannel()->basic_consume(
+                $this->queueName,
+                '',
+                false,
+                true,
+                false,
+                false,
+                function (AMQPMessage $message) use ($callback) {
+                    $callback(unserialize($message->getBody()));
+                }
+            );
         } catch (Throwable $e) {
             throw FailedToConsumeQueue::create($this->queueName, $e);
+        }
+
+        while ($this->getChannel()->is_consuming()) {
+            $this->getChannel()->wait();
         }
     }
 

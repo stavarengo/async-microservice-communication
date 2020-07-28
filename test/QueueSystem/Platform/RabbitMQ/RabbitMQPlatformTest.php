@@ -21,11 +21,14 @@ class RabbitMQPlatformTest extends TestCase
     public function testConsume()
     {
         $queueName = 'queue-name-test';
-        $expectedCallback = function () {
+        $callbackExecuted = false;
+        $expectedCallback = function ($message) use (&$callbackExecuted) {
+            $this->assertInstanceOf(QueueMessageInterface::class, $message);
+            $callbackExecuted = true;
         };
 
-        $rabbitChannel = $this->createMock(AMQPChannel::class);
-        $rabbitChannel->expects($this->once())
+        $channel = $this->createMock(AMQPChannel::class);
+        $channel->expects($this->once())
             ->method('basic_consume')
             ->with(
                 $queueName,
@@ -34,13 +37,26 @@ class RabbitMQPlatformTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
-                $this->identicalTo($expectedCallback),
+                $this->callback(
+                    function ($callback) {
+                        $callback(new AMQPMessage(serialize($this->createStub(QueueMessageInterface::class))));
+
+                        return true;
+                    }
+                ),
             );
+        $channel->expects($this->exactly(2))
+            ->method('is_consuming')
+            ->willReturnOnConsecutiveCalls(true, false);
+        $channel->expects($this->exactly(1))
+            ->method('wait');
 
         $rabbitConnection = $this->createMock(AbstractConnection::class);
-        $rabbitConnection->expects($this->once())->method('channel')->willReturn($rabbitChannel);
+        $rabbitConnection->expects($this->once())->method('channel')->willReturn($channel);
 
         (new RabbitMQPlatform($rabbitConnection, $queueName))->consume($expectedCallback);
+
+        $this->assertTrue($callbackExecuted);
     }
 
     public function testPublish()
@@ -48,8 +64,8 @@ class RabbitMQPlatformTest extends TestCase
         $queueName = 'queue-name-test';
         $expectedMessage = $this->createStub(QueueMessageInterface::class);
 
-        $rabbitChannel = $this->createMock(AMQPChannel::class);
-        $rabbitChannel->expects($this->once())
+        $channel = $this->createMock(AMQPChannel::class);
+        $channel->expects($this->once())
             ->method('basic_publish')
             ->with(
                 $this->callback(
@@ -62,7 +78,7 @@ class RabbitMQPlatformTest extends TestCase
             );
 
         $rabbitConnection = $this->createMock(AbstractConnection::class);
-        $rabbitConnection->expects($this->once())->method('channel')->willReturn($rabbitChannel);
+        $rabbitConnection->expects($this->once())->method('channel')->willReturn($channel);
 
         (new RabbitMQPlatform($rabbitConnection, $queueName))->publish($expectedMessage);
     }
