@@ -12,6 +12,7 @@ use AMC\Broker\Persistence\Exception\FailedToCommitTransaction;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
 use AMC\Broker\Persistence\Exception\FailedToRollbackTransaction;
+use AMC\Broker\Persistence\Exception\FailedToUpdateRecord;
 
 interface PersistenceInterface
 {
@@ -24,6 +25,15 @@ interface PersistenceInterface
      * @throws FailedToInsertNewRecord
      */
     public function insert(string $message): Message;
+
+    /**
+     * Update a record that already exists.
+     *
+     * @param Message $message
+     * @return Message
+     * @throws FailedToUpdateRecord
+     */
+    public function update(Message $message): Message;
 
     /**
      * Returns a message from the persistence service.

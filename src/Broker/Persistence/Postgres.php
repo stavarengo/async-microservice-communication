@@ -12,6 +12,8 @@ use AMC\Broker\Persistence\Exception\FailedToCommitTransaction;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
 use AMC\Broker\Persistence\Exception\FailedToRollbackTransaction;
+use AMC\Broker\Persistence\Exception\FailedToUpdateRecord;
+use AMC\Broker\Persistence\Exception\RecordNotFound;
 use PDO;
 use Throwable;
 
@@ -44,6 +46,22 @@ class Postgres implements PersistenceInterface
             return $messageEntity;
         } catch (Throwable $e) {
             throw FailedToInsertNewRecord::create($e);
+        }
+    }
+
+    public function update(Message $message): Message
+    {
+        try {
+            $sql = /** @lang PostgreSQL */
+                'UPDATE "Broker"."request" SET "message" = ? WHERE "id" = ?';
+
+            $stmt = $this->pdo->prepare($sql);
+
+            $stmt->execute([$message->getMessage(), $message->getId()]);
+
+            return $message;
+        } catch (Throwable $e) {
+            throw FailedToUpdateRecord::create($e);
         }
     }
 

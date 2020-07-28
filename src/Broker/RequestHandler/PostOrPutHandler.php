@@ -18,7 +18,7 @@ use Throwable;
 
 use function GuzzleHttp\Psr7\stream_for;
 
-class PostHandler implements RequestHandlerInterface
+class PostOrPutHandler implements RequestHandlerInterface
 {
     private PersistenceInterface $persistence;
     /**
@@ -53,7 +53,25 @@ class PostHandler implements RequestHandlerInterface
         }
 
         $this->persistence->beginTransaction();
-        $message = $this->persistence->insert($requestBody->message);
+
+        $isPostRequest = $request->getMethod() == 'POST';
+        if ($isPostRequest) {
+            $message = $this->persistence->insert($requestBody->message);
+        } else {
+            $entityId = $request->getQueryParams()['id'] ?? null;
+            $message = $this->persistence->get($entityId);
+
+            if (!$message) {
+                return new Response(
+                    404, ['Content-Type' => 'application/json'],
+                    stream_for(new Error(sprintf('Message "%s" not found.', $entityId)))
+                );
+            }
+
+            $message->setMessage($requestBody->message);
+            $message = $this->persistence->update($message);
+        }
+
         try {
             $this->queue->publish(new QueueMessage($message->getId(), $message->getMessage()));
         } catch (Throwable $e) {
@@ -63,7 +81,7 @@ class PostHandler implements RequestHandlerInterface
         $this->persistence->commit();
 
         return new Response(
-            201,
+            $isPostRequest ? 201 : 200,
             [
                 'Content-Type' => 'application/json'
             ],

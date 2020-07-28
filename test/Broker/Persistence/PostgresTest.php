@@ -15,6 +15,7 @@ use AMC\Broker\Persistence\Exception\FailedToCommitTransaction;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
 use AMC\Broker\Persistence\Exception\FailedToRollbackTransaction;
+use AMC\Broker\Persistence\Exception\FailedToUpdateRecord;
 use AMC\Broker\Persistence\Exception\PersistenceException;
 use AMC\Broker\Persistence\IDGeneratorInterface;
 use AMC\Broker\Persistence\Postgres;
@@ -29,18 +30,18 @@ class PostgresTest extends TestCase
     /**
      * @dataProvider dataProviderInsertRecordThrowException
      */
-    public function testInsertRecordThrowException(callable $invokeRealMethod, PersistenceException $expectedException)
+    public function testThrowException(callable $invokeRealMethod, PersistenceException $expectedException)
     {
         $pdoStub = $this->createStub(PDO::class);
         $pdoStub->method('prepare')->willThrowException($expectedException->getPrevious());
 
         $this->expectExceptionObject($expectedException);
-        $invokeRealMethod(new Postgres($pdoStub, $this->stubIDGenerator('0')));
+        $invokeRealMethod(new Postgres($pdoStub, $this->stubIDGenerator('01')));
     }
 
     public function dataProviderInsertRecordThrowException(): array
     {
-        $fetchId = 'id-123';
+        $idToGet = 'id-123';
 
         return [
             [
@@ -50,10 +51,16 @@ class PostgresTest extends TestCase
                 FailedToInsertNewRecord::create(new PDOException('Test Insert Exception', 333)),
             ],
             [
-                function (Postgres $persistence) use ($fetchId) {
-                    $persistence->get($fetchId);
+                function (Postgres $persistence) use ($idToGet) {
+                    $persistence->get($idToGet);
                 },
-                FailedToFetchRecord::create($fetchId, new PDOException('Test Get Exception', 444)),
+                FailedToFetchRecord::create($idToGet, new PDOException('Test Get Exception', 444)),
+            ],
+            [
+                function (Postgres $persistence) {
+                    $persistence->update(new Message());
+                },
+                FailedToUpdateRecord::create(new PDOException('Test Update Exception', 555)),
             ],
         ];
     }
@@ -71,6 +78,20 @@ class PostgresTest extends TestCase
 
         $this->assertEquals($id, $messageEntity->getId());
         $this->assertEquals($message, $messageEntity->getMessage());
+    }
+
+    public function testUpdateRecord()
+    {
+        $message = new Message('id-update', 'Update message');
+
+        $pdoStub = $this->createStub(PDO::class);
+        $pdoStub->method('prepare')->willReturn($this->createMock(PDOStatement::class));
+
+        $persistence = new Postgres($pdoStub, $this->stubIDGenerator(''));
+        $messageEntity = $persistence->update($message);
+
+        $this->assertEquals($message->getId(), $messageEntity->getId());
+        $this->assertEquals($message->getMessage(), $messageEntity->getMessage());
     }
 
     public function testGetRecord()

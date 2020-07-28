@@ -37,8 +37,10 @@ require __DIR__ . '/../vendor/autoload.php';
                 /** @var \AMC\Broker\RequestHandler\RequestHandlerInterface $requestHandler */
                 $requestHandler = null;
 
-                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                    $requestHandler = $container->get(\AMC\Broker\RequestHandler\PostHandler::class);
+                if ($_SERVER['REQUEST_METHOD'] == 'POST'
+                    || $_SERVER['REQUEST_METHOD'] == 'PUT'
+                ) {
+                    $requestHandler = $container->get(\AMC\Broker\RequestHandler\PostOrPutHandler::class);
                 } elseif ($_SERVER['REQUEST_METHOD'] == 'GET') {
                     $requestHandler = $container->get(\AMC\Broker\RequestHandler\GetHandler::class);
                 }

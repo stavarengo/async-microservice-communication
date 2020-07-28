@@ -8,17 +8,17 @@ namespace AMC\Test\Broker\RequestHandler;
 
 
 use AMC\Broker\Persistence\PersistenceInterface;
-use AMC\Broker\RequestHandler\PostHandler;
-use AMC\Broker\RequestHandler\PostHandlerFactory;
+use AMC\Broker\RequestHandler\PostOrPutHandler;
+use AMC\Broker\RequestHandler\PostOrPutHandlerFactory;
 use AMC\QueueSystem\Platform\PlatformInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class PostHandlerFactoryTest extends TestCase
+class PostOrPutHandlerFactoryTest extends TestCase
 {
     public function testFactoryMustBeInvokable()
     {
-        $factory = new PostHandlerFactory();
+        $factory = new PostOrPutHandlerFactory();
 
         $this->assertIsCallable($factory);
     }
@@ -37,7 +37,7 @@ class PostHandlerFactoryTest extends TestCase
                 $this->createStub(PlatformInterface::class),
             );
 
-        $factory = new PostHandlerFactory();
-        $this->assertInstanceOf(PostHandler::class, $factory($container));
+        $factory = new PostOrPutHandlerFactory();
+        $this->assertInstanceOf(PostOrPutHandler::class, $factory($container));
     }
 }
