@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AMC\Broker;
+
+use PDO;
+
+use function DI\autowire;
+use function DI\factory;
 
 class ConfigProvider
 {
@@ -17,12 +24,12 @@ class ConfigProvider
     public function getContainerDefinitions(): array
     {
         return [
-            \PDO::class => \DI\factory(Factory\PDOFactory::class),
+            PDO::class => factory(Factory\PDOFactory::class),
 
-            Persistence\PersistenceInterface::class => \DI\autowire(Persistence\Postgres::class),
-            Persistence\IDGeneratorInterface::class => \DI\autowire(Persistence\IDGenerator::class),
+            Persistence\PersistenceInterface::class => autowire(Persistence\Postgres::class),
+            Persistence\IDGeneratorInterface::class => autowire(Persistence\IDGenerator::class),
 
-            RequestHandler\PostHandler::class => \DI\autowire(RequestHandler\PostHandler::class),
+            RequestHandler\PostHandler::class => autowire(RequestHandler\PostHandler::class),
         ];
     }
 

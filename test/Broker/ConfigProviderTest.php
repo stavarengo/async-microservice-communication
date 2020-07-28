@@ -1,6 +1,5 @@
 <?php
 
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 namespace AMC\Test\Broker;
@@ -10,6 +9,7 @@ use AMC\Broker\Factory\PDOFactory;
 use AMC\Broker\Persistence\IDGeneratorInterface;
 use AMC\Broker\Persistence\PersistenceInterface;
 use AMC\Broker\RequestHandler\PostHandler;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class ConfigProviderTest extends TestCase
@@ -29,13 +29,13 @@ class ConfigProviderTest extends TestCase
 
         $this->assertCount(4, $config);
 
-        $this->assertArrayHasKey(\PDO::class, $config);
+        $this->assertArrayHasKey(PDO::class, $config);
         $this->assertArrayHasKey(PersistenceInterface::class, $config);
         $this->assertArrayHasKey(IDGeneratorInterface::class, $config);
         $this->assertArrayHasKey(PostHandler::class, $config);
     }
 
-    public function testDispatcherConfig()
+    public function testPDOConfig()
     {
         $configProvider = new ConfigProvider();
 

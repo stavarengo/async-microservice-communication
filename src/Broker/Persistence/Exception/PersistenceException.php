@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 
 namespace AMC\Broker\Persistence\Exception;
 
 
-class PersistenceException extends \Exception
+use Exception;
+
+class PersistenceException extends Exception
 {
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 
 namespace AMC\Test\Broker\Persistence;
 
@@ -19,6 +21,6 @@ class IDGeneratorTest extends TestCase
             $IDGenerator->generate(),
         ];
 
-        $this->assertEquals(count($idsGenerated), count(array_unique($idsGenerated)));
+        $this->assertSameSize($idsGenerated, array_unique($idsGenerated));
     }
 }

@@ -8,10 +8,7 @@ namespace AMC\Broker\ResponseBody;
 
 class Error implements ResponseBodyInterface
 {
-    /**
-     * @var string
-     */
-    protected $detail;
+    protected string $detail;
 
     /**
      * Error constructor.

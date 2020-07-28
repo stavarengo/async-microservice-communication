@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 
 namespace AMC\Broker\RequestHandler;
 
@@ -22,6 +24,7 @@ class GetHandler implements RequestHandlerInterface
         $this->persistence = $persistence;
     }
 
+    /** @noinspection PhpUnhandledExceptionInspection */
     public function handleIt(ServerRequestInterface $request): ResponseInterface
     {
         $id = $request->getQueryParams()['id'] ?? null;

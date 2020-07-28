@@ -11,6 +11,7 @@ class ErrorTest extends TestCase
 {
     /**
      * @dataProvider errorProvider
+     * @param string $detail
      */
     public function testError(string $detail)
     {

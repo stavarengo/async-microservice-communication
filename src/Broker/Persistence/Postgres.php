@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 
 namespace AMC\Broker\Persistence;
 
@@ -7,16 +9,18 @@ namespace AMC\Broker\Persistence;
 use AMC\Broker\Entity\Message;
 use AMC\Broker\Persistence\Exception\FailedToFetchRecord;
 use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
+use PDO;
+use Throwable;
 
 class Postgres implements PersistenceInterface
 {
-    private \PDO $pdo;
+    private PDO $pdo;
     /**
      * @var IDGeneratorInterface
      */
     private IDGeneratorInterface $IDGenerator;
 
-    public function __construct(\PDO $pdo, IDGeneratorInterface $IDGenerator)
+    public function __construct(PDO $pdo, IDGeneratorInterface $IDGenerator)
     {
         $this->pdo = $pdo;
         $this->IDGenerator = $IDGenerator;
@@ -35,7 +39,7 @@ class Postgres implements PersistenceInterface
             $stmt->execute([$messageEntity->getId(), $messageEntity->getMessage()]);
 
             return $messageEntity;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw FailedToInsertNewRecord::create($e);
         }
     }
@@ -49,12 +53,12 @@ class Postgres implements PersistenceInterface
 
             $message = null;
 
-            if ($stmt->execute([$id]) && $fetchResult = $stmt->fetch(\PDO::FETCH_OBJ)) {
+            if ($stmt->execute([$id]) && $fetchResult = $stmt->fetch(PDO::FETCH_OBJ)) {
                 $message = new Message($fetchResult->id, $fetchResult->message);
             }
 
             return $message;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw FailedToFetchRecord::create($id, $e);
         }
     }

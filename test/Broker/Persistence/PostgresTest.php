@@ -1,4 +1,9 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
+
+/** @noinspection PhpUnhandledExceptionInspection */
+
+declare(strict_types=1);
 
 
 namespace AMC\Test\Broker\Persistence;
@@ -10,6 +15,9 @@ use AMC\Broker\Persistence\Exception\FailedToInsertNewRecord;
 use AMC\Broker\Persistence\Exception\PersistenceException;
 use AMC\Broker\Persistence\IDGeneratorInterface;
 use AMC\Broker\Persistence\Postgres;
+use PDO;
+use PDOException;
+use PDOStatement;
 use PHPUnit\Framework\TestCase;
 
 class PostgresTest extends TestCase
@@ -20,7 +28,7 @@ class PostgresTest extends TestCase
      */
     public function testInsertRecordThrowException(callable $invokeRealMethod, PersistenceException $expectedException)
     {
-        $pdoStub = $this->createStub(\PDO::class);
+        $pdoStub = $this->createStub(PDO::class);
         $pdoStub->method('prepare')->willThrowException($expectedException->getPrevious());
 
         $this->expectExceptionObject($expectedException);
@@ -36,13 +44,13 @@ class PostgresTest extends TestCase
                 function (Postgres $persistence) {
                     $persistence->insert('Test');
                 },
-                FailedToInsertNewRecord::create(new \PDOException('Test Insert Exception', 333)),
+                FailedToInsertNewRecord::create(new PDOException('Test Insert Exception', 333)),
             ],
             [
                 function (Postgres $persistence) use ($fetchId) {
                     $persistence->get($fetchId);
                 },
-                FailedToFetchRecord::create($fetchId, new \PDOException('Test Get Exception', 444)),
+                FailedToFetchRecord::create($fetchId, new PDOException('Test Get Exception', 444)),
             ],
         ];
     }
@@ -52,8 +60,8 @@ class PostgresTest extends TestCase
         $id = '123-id';
         $message = 'First message';
 
-        $pdoStub = $this->createStub(\PDO::class);
-        $pdoStub->method('prepare')->willReturn($this->createMock(\PDOStatement::class));
+        $pdoStub = $this->createStub(PDO::class);
+        $pdoStub->method('prepare')->willReturn($this->createMock(PDOStatement::class));
 
         $persistence = new Postgres($pdoStub, $this->stubIDGenerator($id));
         $messageEntity = $persistence->insert($message);
@@ -66,7 +74,7 @@ class PostgresTest extends TestCase
     {
         $expectedEntity = new Message('test-123-id', 'Test message');
 
-        $PDOStatementStub = $this->createStub(\PDOStatement::class);
+        $PDOStatementStub = $this->createStub(PDOStatement::class);
         $PDOStatementStub->method('execute')->willReturn(true);
         $PDOStatementStub->method('fetch')->willReturn(
             (object)[
@@ -75,7 +83,7 @@ class PostgresTest extends TestCase
             ]
         );
 
-        $pdoStub = $this->createStub(\PDO::class);
+        $pdoStub = $this->createStub(PDO::class);
         $pdoStub->method('prepare')->willReturn($PDOStatementStub);
 
         $persistence = new Postgres($pdoStub, $this->stubIDGenerator($expectedEntity->getId()));
@@ -88,9 +96,9 @@ class PostgresTest extends TestCase
 
     public function testGetRecordThatDoesNotExists()
     {
-        $PDOStatementStub = $this->createStub(\PDOStatement::class);
+        $PDOStatementStub = $this->createStub(PDOStatement::class);
 
-        $pdoStub = $this->createStub(\PDO::class);
+        $pdoStub = $this->createStub(PDO::class);
         $pdoStub->method('prepare')->willReturn($PDOStatementStub);
 
         $persistence = new Postgres($pdoStub, $this->stubIDGenerator('id-123'));

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 
 namespace AMC\Broker\Factory;
 
 
 use AMC\Broker\ConfigProvider;
 use AMC\Broker\Factory\Exception\MissingConfigEntry;
+use PDO;
 use Psr\Container\ContainerInterface;
 
 class PDOFactory
@@ -34,7 +37,7 @@ class PDOFactory
             }
         }
 
-        return new \PDO(
+        return new PDO(
             sprintf(
                 '%s:host=%s',
                 $pdoConfig[self::DRIVE_NAME] ?? '',
@@ -43,8 +46,8 @@ class PDOFactory
             $pdoConfig[self::USERNAME] ?? '',
             $pdoConfig[self::PASSWORD] ?? null,
             [
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]
         );
     }

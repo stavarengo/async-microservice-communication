@@ -1,4 +1,7 @@
 <?php
+/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 declare(strict_types=1);
 
@@ -54,7 +57,7 @@ require __DIR__ . '/../vendor/autoload.php';
         }
 
         http_response_code($response->getStatusCode());
-        foreach ($response->getHeaders() as $headerName => $hederValue) {
+        foreach ($response->getHeaders() as $headerName => $headerValue) {
             header(sprintf('%s: %s', $headerName, $response->getHeaderLine($headerName)));
         }
         echo $response->getBody()->getContents();

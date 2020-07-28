@@ -1,4 +1,7 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
+
+declare(strict_types=1);
 
 
 namespace AMC\Test\Broker\Factory;
@@ -7,6 +10,8 @@ namespace AMC\Test\Broker\Factory;
 use AMC\Broker\ConfigProvider;
 use AMC\Broker\Factory\Exception\MissingConfigEntry;
 use AMC\Broker\Factory\PDOFactory;
+use Exception;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -37,11 +42,11 @@ class PDOFactoryTest extends TestCase
         if ($doesContainerHasConfigEntry) {
             $mockContainerGetResultMap[] = ['config', $config];
         } else {
-            $mockContainer->method('get')->willThrowException(new \Exception());
+            $mockContainer->method('get')->willThrowException(new Exception());
         }
 
         if ($isContainerWellConfigured) {
-            $this->expectException(\PDOException::class);
+            $this->expectException(PDOException::class);
         } else {
             $this->expectException(MissingConfigEntry::class);
         }
