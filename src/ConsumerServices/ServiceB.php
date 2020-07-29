@@ -8,23 +8,27 @@ use AMC\Broker\Entity\Message;
 use AMC\Broker\Persistence\PersistenceInterface;
 use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Message\QueueMessageInterface;
+use Psr\Log\LoggerInterface;
 
 class ServiceB
 {
     private FacadeInterface $queue;
     private PersistenceInterface $persistence;
+    private LoggerInterface $logger;
 
     public function __construct(
         FacadeInterface $queuePlatform,
-        PersistenceInterface $persistence
+        PersistenceInterface $persistence,
+        LoggerInterface $logger
     ) {
         $this->queue = $queuePlatform;
         $this->persistence = $persistence;
+        $this->logger = $logger;
     }
 
     public function execute(): void
     {
-        echo sprintf("%s: Waiting for messages....\n", self::class);
+        $this->logger->debug('Waiting for messages....', ['caller' => self::class]);
 
         $this->queue->consumeQueueB([$this, 'consumeCallback']);
     }
@@ -34,7 +38,10 @@ class ServiceB
         $originalMessage = trim($message->getBody());
         $newMessage = sprintf('%s %s', $originalMessage, 'Bye!');
 
-        echo sprintf("%s: Received '%s', sending '%s' back to API.\n", self::class, $originalMessage, $newMessage);
+        $this->logger->debug(
+            sprintf('Received "%s", sending "%s" back to API.', $originalMessage, $newMessage),
+            ['caller' => self::class]
+        );
 
         $this->persistence->update(new Message($message->getId(), $newMessage));
     }

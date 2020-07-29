@@ -8,26 +8,31 @@ use AMC\ConsumerServices\BrokerClient\ClientInterface;
 use AMC\ConsumerServices\NameProvider\NameProviderInterface;
 use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Message\QueueMessageInterface;
+use Psr\Log\LoggerInterface;
 
 class ServiceA
 {
     private FacadeInterface $queue;
     private NameProviderInterface $nameProvider;
     private ClientInterface $brokerClient;
+    private LoggerInterface $logger;
 
     public function __construct(
         FacadeInterface $queue,
         NameProviderInterface $nameProvider,
-        ClientInterface $brokerClient
+        ClientInterface $brokerClient,
+        LoggerInterface $logger
     ) {
         $this->queue = $queue;
         $this->nameProvider = $nameProvider;
         $this->brokerClient = $brokerClient;
+        $this->logger = $logger;
     }
 
     public function execute(): void
     {
-        echo sprintf("%s: Waiting for messages....\n", self::class);
+        $this->logger->debug('Waiting for messages....', ['caller' => self::class]);
+
         $this->queue->consumeQueueA([$this, 'consumeCallback']);
     }
 
@@ -36,7 +41,10 @@ class ServiceA
         $originalMessage = trim($message->getBody());
         $newMessage = sprintf('%s %s.', $originalMessage, $this->nameProvider->getName());
 
-        echo sprintf("%s: Received '%s', sending '%s' back to API.\n", self::class, $originalMessage, $newMessage);
+        $this->logger->debug(
+            sprintf('Received "%s", sending "%s" back to API.', $originalMessage, $newMessage),
+            ['caller' => self::class]
+        );
 
         $this->brokerClient->put($message->getId(), $newMessage);
     }

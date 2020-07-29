@@ -8,14 +8,17 @@ use AMC\ConsumerServices\BrokerClient\ClientInterface;
 use AMC\ConsumerServices\BrokerClient\Exception\BrokerClientException;
 use AMC\ConsumerServices\Exception\NoResponse;
 use GuzzleHttp\Exception\ServerException;
+use Psr\Log\LoggerInterface;
 
 class Requester
 {
     private ClientInterface $api;
+    private LoggerInterface $logger;
 
-    public function __construct(ClientInterface $api)
+    public function __construct(ClientInterface $api, LoggerInterface $logger)
     {
         $this->api = $api;
+        $this->logger = $logger;
     }
 
     public function execute(): void
@@ -26,7 +29,7 @@ class Requester
             die($e->getResponse()->getBody()->getContents());
         }
 
-        echo sprintf("%s: New message registered with ID '%s'.\n", self::class, $entityId);
+        $this->logger->debug(sprintf('New message registered with ID "%s".', $entityId), ['caller' => self::class]);
 
         $maximumTimeToWaitInMicroseconds = 1000000;
         $intervalInMicrosecondsBetweenEachTry = 50000;
@@ -49,11 +52,13 @@ class Requester
             throw NoResponse::create();
         }
 
-        echo sprintf(
-            "%s: Answer for message '%s' is ready. Took '%s' microseconds.\n",
-            self::class,
-            $entityId,
-            $timeWaitedInMicroseconds
+        $this->logger->debug(
+            sprintf(
+                'Answer for message "%s" is ready. Took "%s" microseconds.',
+                $entityId,
+                $timeWaitedInMicroseconds
+            ),
+            ['caller' => self::class]
         );
 
         echo "\n$message\n\n";

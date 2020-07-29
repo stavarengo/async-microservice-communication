@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace AMC\ConsumerServices;
 
 use AMC\ConsumerServices\BrokerClient\ClientFactory;
+use AMC\ConsumerServices\Logger\StdOut;
 use AMC\ConsumerServices\NameProvider\HumanNameProvider;
 use AMC\ConsumerServices\NameProvider\HumanNameProviderFactory;
+use Psr\Log\LoggerInterface;
 
 use function DI\autowire;
 use function DI\factory;
@@ -33,6 +35,8 @@ class ConfigProvider
             BrokerClient\ClientInterface::class => factory(ClientFactory::class),
 
             NameProvider\NameProviderInterface::class => factory(HumanNameProviderFactory::class),
+
+            LoggerInterface::class => autowire(StdOut::class),
         ];
     }
 
