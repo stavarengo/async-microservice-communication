@@ -5,7 +5,7 @@
 This project shows an example of asynchronous communications between microservices.
 - The application is controlled with configuration files (nothing is hard coded), which makes it easy to work with 
 different environments (eg: stage, development, production, etc).
-- Both modules [Borker] and [QueueSystem] are 100% covered with unit tests.
+- Both modules [Broker] and [QueueSystem] are 100% covered with unit tests.
 - Use [PHP PSR] standards.
 - No frameworks were used (besides [PHPUnit]).
 - Only four dependencies:
