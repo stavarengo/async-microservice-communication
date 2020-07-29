@@ -44,7 +44,7 @@ require __DIR__ . '/../vendor/autoload.php';
                 if ($_SERVER['REQUEST_METHOD'] == 'POST'
                     || $_SERVER['REQUEST_METHOD'] == 'PUT'
                 ) {
-                    $requestHandler = $container->get(\AMC\Broker\RequestHandler\PostOrPutHandler::class);
+                    $requestHandler = $container->get(\AMC\Broker\RequestHandler\PostOrPut\PostOrPutHandler::class);
                 } elseif ($_SERVER['REQUEST_METHOD'] == 'GET') {
                     $requestHandler = $container->get(\AMC\Broker\RequestHandler\GetHandler::class);
                 }
