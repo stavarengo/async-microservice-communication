@@ -33,6 +33,10 @@ class ConfigProvider
                 'queuePlatform',
                 get(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A)
             ),
+            ServiceB::class => autowire(ServiceB::class)->constructorParameter(
+                'queuePlatform',
+                get(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_B)
+            ),
 
             BrokerClient\ClientInterface::class => factory(ClientFactory::class),
 

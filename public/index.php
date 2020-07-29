@@ -25,12 +25,16 @@ require __DIR__ . '/../vendor/autoload.php';
 
     switch ($type) {
         case 'service-a';
-            $serviceA = $container->get(\AMC\ConsumerServices\ServiceA::class);
-            echo $serviceA->execute();
+            $service = $container->get(\AMC\ConsumerServices\ServiceA::class);
+            $service->execute();
             exit;
         case 'service-b';
-            $serviceA = $container->get(\AMC\ConsumerServices\ServiceA::class);
-            echo $serviceA->execute();
+            $service = $container->get(\AMC\ConsumerServices\ServiceB::class);
+            $service->execute();
+            exit;
+        case 'requester';
+            $requester = $container->get(\AMC\ConsumerServices\Requester::class);
+            echo $requester->execute();
             exit;
         default:
             try {

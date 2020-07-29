@@ -7,9 +7,15 @@ namespace AMC\ConsumerServices\BrokerClient\Exception;
 
 
 use RuntimeException;
+use Throwable;
 
 class BrokerClientException extends RuntimeException
 {
+    public static function create(Throwable $reason): self
+    {
+        return new self('Unexpected exception.', $reason->getCode(), $reason);
+    }
+
     public static function unexpectedStatusCode(int $expectedCode, int $actualCode): self
     {
         return new self(

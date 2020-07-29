@@ -10,6 +10,7 @@ use AMC\ConsumerServices\BrokerClient\Exception\BrokerClientException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use stdClass;
+use Throwable;
 
 class Client implements ClientInterface
 {
@@ -26,7 +27,6 @@ class Client implements ClientInterface
         $this->client = $client;
     }
 
-
     public function post(string $message): string
     {
         return $this->putOrPost(null, $message);
@@ -34,12 +34,23 @@ class Client implements ClientInterface
 
     public function put(string $id, string $message): void
     {
-        $this->putOrPost(null, $message);
+        $this->putOrPost($id, $message);
     }
 
     public function get(string $id): ?string
     {
-        $response = $this->client->get(`/$id`);
+        try {
+            $response = $this->client->get(
+                '/',
+                [
+                    RequestOptions::QUERY => [
+                        'id' => $id,
+                    ]
+                ]
+            );
+        } catch (Throwable $e) {
+            throw BrokerClientException::create($e);
+        }
 
         $responseEntity = $this->validateResponse($response, 200, 'message');
 
@@ -56,14 +67,19 @@ class Client implements ClientInterface
 
         $expectedStatusCode = 201;
         $method = 'POST';
-        $uri = '/';
         if ($id) {
             $expectedStatusCode = 200;
-            $method = 'POST';
-            $uri = `/$id`;
+            $method = 'PUT';
+            $requestOptions[RequestOptions::QUERY] = [
+                'id' => $id,
+            ];
         }
 
-        $response = $this->client->request($method, $uri, $requestOptions);
+        try {
+            $response = $this->client->request($method, '/', $requestOptions);
+        } catch (Throwable $e) {
+            throw BrokerClientException::create($e);
+        }
 
         $responseEntity = $this->validateResponse($response, $expectedStatusCode, 'id');
 
