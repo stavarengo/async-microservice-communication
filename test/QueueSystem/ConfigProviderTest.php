@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AMC\Test\QueueSystem;
 
 use AMC\QueueSystem\ConfigProvider;
+use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Platform\PlatformInterface;
 use AMC\QueueSystem\Platform\RabbitMQ\RabbitMQConnectionFactory;
 use PhpAmqpLib\Connection\AbstractConnection;
@@ -25,8 +26,9 @@ class ConfigProviderTest extends TestCase
 
         $config = $configProvider->getContainerDefinitions();
 
-        $this->assertCount(3, $config);
+        $this->assertCount(4, $config);
 
+        $this->assertArrayHasKey(FacadeInterface::class, $config);
         $this->assertArrayHasKey(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A, $config);
         $this->assertArrayHasKey(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_B, $config);
         $this->assertArrayHasKey(AbstractConnection::class, $config);

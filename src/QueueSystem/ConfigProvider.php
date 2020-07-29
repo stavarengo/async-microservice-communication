@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AMC\QueueSystem;
 
+use AMC\QueueSystem\Facade\FacadeFactory;
+use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Platform\PlatformInterface;
 use PhpAmqpLib\Connection\AbstractConnection as RabbitMQConnection;
 
@@ -26,6 +28,8 @@ class ConfigProvider
     {
         return [
             RabbitMQConnection::class => factory(Platform\RabbitMQ\RabbitMQConnectionFactory::class),
+
+            FacadeInterface::class => factory(FacadeFactory::class),
 
             PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A => autowire(Platform\RabbitMQ\RabbitMQPlatform::class)
                 ->constructorParameter('queueName', 'topic-a'),

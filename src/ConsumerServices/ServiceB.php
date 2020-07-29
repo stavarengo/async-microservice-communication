@@ -6,19 +6,19 @@ namespace AMC\ConsumerServices;
 
 use AMC\Broker\Entity\Message;
 use AMC\Broker\Persistence\PersistenceInterface;
+use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Message\QueueMessageInterface;
-use AMC\QueueSystem\Platform\PlatformInterface;
 
 class ServiceB
 {
-    private PlatformInterface $queuePlatform;
+    private FacadeInterface $queue;
     private PersistenceInterface $persistence;
 
     public function __construct(
-        PlatformInterface $queuePlatform,
+        FacadeInterface $queuePlatform,
         PersistenceInterface $persistence
     ) {
-        $this->queuePlatform = $queuePlatform;
+        $this->queue = $queuePlatform;
         $this->persistence = $persistence;
     }
 
@@ -26,7 +26,7 @@ class ServiceB
     {
         echo sprintf("%s: Waiting for messages....\n", self::class);
 
-        $this->queuePlatform->consume([$this, 'consumeCallback']);
+        $this->queue->consumeQueueB([$this, 'consumeCallback']);
     }
 
     public function consumeCallback(QueueMessageInterface $message)

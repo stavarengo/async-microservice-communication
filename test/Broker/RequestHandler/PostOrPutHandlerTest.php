@@ -8,10 +8,10 @@ namespace AMC\Test\Broker\RequestHandler;
 use AMC\Broker\Entity\Message;
 use AMC\Broker\Persistence\PersistenceInterface;
 use AMC\Broker\RequestHandler\PostOrPutHandler;
+use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Message\QueueMessage;
 use AMC\QueueSystem\Message\QueueMessageInterface;
 use AMC\QueueSystem\Platform\Exception\FailedToPublishMessage;
-use AMC\QueueSystem\Platform\PlatformInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,7 +25,7 @@ class PostOrPutHandlerTest extends TestCase
      */
     public function testRequestSucceed(Message $entity, string $method, int $expectedHttpStatusCode)
     {
-        $queue = $this->createStub(PlatformInterface::class);
+        $queue = $this->createStub(FacadeInterface::class);
 
         $persistent = $this->createMock(PersistenceInterface::class);
 
@@ -52,7 +52,7 @@ class PostOrPutHandlerTest extends TestCase
 
     public function testPutRequestReturns404()
     {
-        $queue = $this->createStub(PlatformInterface::class);
+        $queue = $this->createStub(FacadeInterface::class);
 
         $persistent = $this->createMock(PersistenceInterface::class);
         $persistent->expects($this->once())->method('get')->willReturn(null);
@@ -80,7 +80,7 @@ class PostOrPutHandlerTest extends TestCase
         $persistence->method('update')->willReturn($entity);
         $persistence->method('get')->willReturn($entity);
 
-        $queue = $this->createMock(PlatformInterface::class);
+        $queue = $this->createMock(FacadeInterface::class);
 
         $queue->expects($this->once())
             ->method('publish')
@@ -93,7 +93,9 @@ class PostOrPutHandlerTest extends TestCase
                 )
             );
 
-        (new PostOrPutHandler($persistence, $queue))->handleIt($this->mockRequestWithEntity($entity, $method));
+        (new PostOrPutHandler($persistence, $queue))->handleIt(
+            $this->mockRequestWithEntity($entity, $method)
+        );
     }
 
     /**
@@ -114,7 +116,7 @@ class PostOrPutHandlerTest extends TestCase
             new RuntimeException('Test Exception ' . $method)
         );
 
-        $queue = $this->createMock(PlatformInterface::class);
+        $queue = $this->createMock(FacadeInterface::class);
         $queue->method('publish')->willThrowException($failedToPublishMessageException);
 
         $this->expectExceptionObject($failedToPublishMessageException);
@@ -129,8 +131,7 @@ class PostOrPutHandlerTest extends TestCase
         string $expectedErrorMessage,
         int $expectedStatusCode,
         ServerRequestInterface $request
-    )
-    {
+    ) {
         $entity = new Message('', '');
         $persistence = $this->createStub(PersistenceInterface::class);
         $persistence->method('get')->willReturn($entity);
@@ -139,7 +140,7 @@ class PostOrPutHandlerTest extends TestCase
 
         $requestHandler = new PostOrPutHandler(
             $persistence,
-            $this->createStub(PlatformInterface::class)
+            $this->createStub(FacadeInterface::class)
         );
         $response = $requestHandler->handleIt($request);
 

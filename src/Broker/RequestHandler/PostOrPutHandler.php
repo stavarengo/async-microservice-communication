@@ -9,8 +9,8 @@ namespace AMC\Broker\RequestHandler;
 use AMC\Broker\Persistence\PersistenceInterface;
 use AMC\Broker\ResponseBody\Error;
 use AMC\Broker\ResponseBody\ResponseWithMessage;
+use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Message\QueueMessage;
-use AMC\QueueSystem\Platform\PlatformInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,12 +21,9 @@ use function GuzzleHttp\Psr7\stream_for;
 class PostOrPutHandler implements RequestHandlerInterface
 {
     private PersistenceInterface $persistence;
-    /**
-     * @var PlatformInterface
-     */
-    private PlatformInterface $queue;
+    private FacadeInterface $queue;
 
-    public function __construct(PersistenceInterface $persistence, PlatformInterface $queue)
+    public function __construct(PersistenceInterface $persistence, FacadeInterface $queue)
     {
         $this->persistence = $persistence;
         $this->queue = $queue;
@@ -58,7 +55,7 @@ class PostOrPutHandler implements RequestHandlerInterface
         if ($isPostRequest) {
             $message = $this->persistence->insert($requestBody->message);
         } else {
-            $entityId = $request->getQueryParams()['id'] ?? null;
+            $entityId = $request->getQueryParams()['id'] ?? '';
             $message = $this->persistence->get($entityId);
 
             if (!$message) {

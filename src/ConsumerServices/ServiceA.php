@@ -6,21 +6,21 @@ namespace AMC\ConsumerServices;
 
 use AMC\ConsumerServices\BrokerClient\ClientInterface;
 use AMC\ConsumerServices\NameProvider\NameProviderInterface;
+use AMC\QueueSystem\Facade\FacadeInterface;
 use AMC\QueueSystem\Message\QueueMessageInterface;
-use AMC\QueueSystem\Platform\PlatformInterface;
 
 class ServiceA
 {
-    private PlatformInterface $queuePlatform;
+    private FacadeInterface $queue;
     private NameProviderInterface $nameProvider;
     private ClientInterface $brokerClient;
 
     public function __construct(
-        PlatformInterface $queuePlatform,
+        FacadeInterface $queue,
         NameProviderInterface $nameProvider,
         ClientInterface $brokerClient
     ) {
-        $this->queuePlatform = $queuePlatform;
+        $this->queue = $queue;
         $this->nameProvider = $nameProvider;
         $this->brokerClient = $brokerClient;
     }
@@ -28,7 +28,7 @@ class ServiceA
     public function execute(): void
     {
         echo sprintf("%s: Waiting for messages....\n", self::class);
-        $this->queuePlatform->consume([$this, 'consumeCallback']);
+        $this->queue->consume([$this, 'consumeCallback']);
     }
 
     public function consumeCallback(QueueMessageInterface $message)

@@ -27,7 +27,7 @@ class GetHandler implements RequestHandlerInterface
     /** @noinspection PhpUnhandledExceptionInspection */
     public function handleIt(ServerRequestInterface $request): ResponseInterface
     {
-        $id = $request->getQueryParams()['id'] ?? null;
+        $id = $request->getQueryParams()['id'] ?? '';
 
         $message = $this->persistence->get($id);
 

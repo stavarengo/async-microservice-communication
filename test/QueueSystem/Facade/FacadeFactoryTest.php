@@ -4,21 +4,20 @@
 declare(strict_types=1);
 
 
-namespace AMC\Test\Broker\RequestHandler;
+namespace AMC\Test\QueueSystem\Facade;
 
 
-use AMC\Broker\Persistence\PersistenceInterface;
-use AMC\Broker\RequestHandler\PostOrPutHandler;
-use AMC\Broker\RequestHandler\PostOrPutHandlerFactory;
+use AMC\QueueSystem\Facade\Facade;
+use AMC\QueueSystem\Facade\FacadeFactory;
 use AMC\QueueSystem\Platform\PlatformInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class PostOrPutHandlerFactoryTest extends TestCase
+class FacadeFactoryTest extends TestCase
 {
     public function testFactoryMustBeInvokable()
     {
-        $factory = new PostOrPutHandlerFactory();
+        $factory = new FacadeFactory();
 
         $this->assertIsCallable($factory);
     }
@@ -29,15 +28,15 @@ class PostOrPutHandlerFactoryTest extends TestCase
         $container->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
-                [$this->equalTo(PersistenceInterface::class)],
-                [$this->equalTo(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A)]
+                [$this->equalTo(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_A)],
+                [$this->equalTo(PlatformInterface::SERVICE_NAME_QUEUE_TOPIC_B)]
             )
             ->willReturnOnConsecutiveCalls(
-                $this->createStub(PersistenceInterface::class),
+                $this->createStub(PlatformInterface::class),
                 $this->createStub(PlatformInterface::class),
             );
 
-        $factory = new PostOrPutHandlerFactory();
-        $this->assertInstanceOf(PostOrPutHandler::class, $factory($container));
+        $factory = new FacadeFactory();
+        $this->assertInstanceOf(Facade::class, $factory($container));
     }
 }
