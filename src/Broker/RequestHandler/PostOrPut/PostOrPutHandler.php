@@ -22,18 +22,18 @@ use function GuzzleHttp\Psr7\stream_for;
 class PostOrPutHandler implements RequestHandlerInterface
 {
     private FacadeInterface $queue;
-    private SpecificMethodHandlerInterface $postHandle;
-    private SpecificMethodHandlerInterface $putHandle;
+    private SpecificMethodHandlerInterface $postHandler;
+    private SpecificMethodHandlerInterface $putHandler;
     private PersistenceInterface $persistence;
 
     public function __construct(
-        SpecificMethodHandlerInterface $postHandle,
-        SpecificMethodHandlerInterface $putHandle,
+        SpecificMethodHandlerInterface $postHandler,
+        SpecificMethodHandlerInterface $putHandler,
         PersistenceInterface $persistence,
         FacadeInterface $queue
     ) {
-        $this->postHandle = $postHandle;
-        $this->putHandle = $putHandle;
+        $this->postHandler = $postHandler;
+        $this->putHandler = $putHandler;
         $this->persistence = $persistence;
         $this->queue = $queue;
     }
@@ -41,6 +41,7 @@ class PostOrPutHandler implements RequestHandlerInterface
     /** @noinspection PhpUnhandledExceptionInspection */
     public function handleIt(ServerRequestInterface $request): ResponseInterface
     {
+        usleep(1000000);
         $bodyContent = $request->getBody()->getContents();
         $requestBody = $bodyContent ? (object)json_decode($bodyContent) : null;
 
@@ -61,8 +62,8 @@ class PostOrPutHandler implements RequestHandlerInterface
         $this->persistence->beginTransaction();
 
         $requestHandlerMap = [
-            'POST' => $this->postHandle,
-            'PUT' => $this->putHandle,
+            'POST' => $this->postHandler,
+            'PUT' => $this->putHandler,
         ];
 
         /** @var SpecificMethodHandlerInterface $handler */

@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace AMC\Broker;
 
+use AMC\Broker\RequestHandler\PostOrPut\PostOrPutHandler;
+use AMC\Broker\RequestHandler\PostOrPut\SpecificMethodHandler\Post;
+use AMC\Broker\RequestHandler\PostOrPut\SpecificMethodHandler\Put;
 use PDO;
 
 use function DI\autowire;
 use function DI\factory;
+use function DI\get;
 
 class ConfigProvider
 {
@@ -28,6 +32,10 @@ class ConfigProvider
 
             Persistence\PersistenceInterface::class => autowire(Persistence\Postgres::class),
             Persistence\IDGeneratorInterface::class => autowire(Persistence\IDGenerator::class),
+
+            RequestHandler\PostOrPut\PostOrPutHandler::class => autowire(PostOrPutHandler::class)
+                ->constructorParameter('postHandler', get(Post::class))
+                ->constructorParameter('putHandler', get(Put::class)),
         ];
     }
 

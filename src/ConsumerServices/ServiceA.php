@@ -28,7 +28,7 @@ class ServiceA
     public function execute(): void
     {
         echo sprintf("%s: Waiting for messages....\n", self::class);
-        $this->queue->consume([$this, 'consumeCallback']);
+        $this->queue->consumeQueueA([$this, 'consumeCallback']);
     }
 
     public function consumeCallback(QueueMessageInterface $message)
