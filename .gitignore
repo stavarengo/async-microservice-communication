@@ -1,3 +1,4 @@
+config/autoload/*.local.php
 composer.phar
 .idea/
 vendor/

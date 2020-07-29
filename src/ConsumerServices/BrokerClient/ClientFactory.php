@@ -25,7 +25,7 @@ class ClientFactory
         $httpClient = new \GuzzleHttp\Client(
             [
                 'base_uri' => $clientConfig[Client::API_ADDRESS],
-                RequestOptions::TIMEOUT => 3,
+                RequestOptions::TIMEOUT => 6,
             ]
         );
 

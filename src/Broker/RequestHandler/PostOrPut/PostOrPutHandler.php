@@ -41,7 +41,6 @@ class PostOrPutHandler implements RequestHandlerInterface
     /** @noinspection PhpUnhandledExceptionInspection */
     public function handleIt(ServerRequestInterface $request): ResponseInterface
     {
-        usleep(1000000);
         $bodyContent = $request->getBody()->getContents();
         $requestBody = $bodyContent ? (object)json_decode($bodyContent) : null;
 

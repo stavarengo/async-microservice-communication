@@ -1,0 +1,69 @@
+version: '3.7'
+services:
+  php-api:
+    build:
+      context: .
+    volumes:
+      - ./:/usr/src/async-microservice-communication
+      - ./docker/docker.local.php:/usr/src/async-microservice-communication/config/autoload/docker.local.php
+    links:
+      - message-broker:message-borker
+      - db:db
+    command:
+      - -f
+      - composer.phar
+      - run
+      - serve
+  php-consumer-a:
+    build:
+      context: .
+    volumes:
+      - ./:/usr/src/async-microservice-communication
+      - ./docker/docker.local.php:/usr/src/async-microservice-communication/config/autoload/docker.local.php
+    links:
+      - message-broker:message-borker
+      - php-api:php-api
+      - db:db
+    command:
+      - -f
+      - public/index.php
+      - service-a
+  php-consumer-b:
+    build:
+      context: .
+    volumes:
+      - ./:/usr/src/async-microservice-communication
+      - ./docker/docker.local.php:/usr/src/async-microservice-communication/config/autoload/docker.local.php
+    links:
+      - message-broker:message-borker
+      - db:db
+    command:
+      - -f
+      - public/index.php
+      - service-b
+  php-requester:
+    build:
+      context: .
+    volumes:
+      - ./:/usr/src/async-microservice-communication
+      - ./docker/docker.local.php:/usr/src/async-microservice-communication/config/autoload/docker.local.php
+    links:
+      - php-api:php-api
+    command:
+      - -f
+      - public/index.php
+      - requester
+  message-broker:
+    image: rabbitmq:3.8.5-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  db:
+    image: postgres:12.3-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/database.sql:/docker-entrypoint-initdb.d/database.sql

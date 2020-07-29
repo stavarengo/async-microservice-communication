@@ -12,6 +12,7 @@ use AMC\QueueSystem\Platform\Exception\FailedToPublishMessage;
 use AMC\QueueSystem\Platform\PlatformInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Exception\AMQPIOException;
 use PhpAmqpLib\Message\AMQPMessage;
 use Throwable;
 
@@ -65,7 +66,25 @@ class RabbitMQPlatform implements PlatformInterface
     private function getChannel(): AMQPChannel
     {
         if (!$this->channel) {
-            $this->channel = $this->rabbitConnection->channel();
+            $recursiveFunction = function (int $howManyTries) use (&$recursiveFunction): AMQPChannel {
+                try {
+                    $howManyTries--;
+
+                    return $this->rabbitConnection->channel();
+                } catch (AMQPIOException $e) {
+                    // @codeCoverageIgnoreStart
+                    if ($howManyTries > 0) {
+                        sleep(1);
+
+                        return $recursiveFunction(--$howManyTries);
+                    }
+
+                    throw $e;
+                    // @codeCoverageIgnoreStart
+                }
+            };
+
+            $this->channel = $recursiveFunction(10);
             $this->channel->queue_declare(
                 $this->queueName,
                 false,

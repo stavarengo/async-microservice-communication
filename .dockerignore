@@ -1,0 +1,8 @@
+.git/
+composer.phar
+vendor/
+.idea/
+test-coverage/
+.phpunit.result.cache
+config/autoload/*.local.php
+

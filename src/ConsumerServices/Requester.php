@@ -7,6 +7,7 @@ namespace AMC\ConsumerServices;
 use AMC\ConsumerServices\BrokerClient\ClientInterface;
 use AMC\ConsumerServices\BrokerClient\Exception\BrokerClientException;
 use AMC\ConsumerServices\Exception\NoResponse;
+use GuzzleHttp\Exception\ServerException;
 
 class Requester
 {
@@ -19,11 +20,15 @@ class Requester
 
     public function execute(): void
     {
-        $entityId = $this->api->post('Hi, ');
+        try {
+            $entityId = $this->api->post('Hi, ');
+        } catch (ServerException  $e) {
+            die($e->getResponse()->getBody()->getContents());
+        }
 
         echo sprintf("%s: New message registered with ID '%s'.\n", self::class, $entityId);
 
-        $maximumTimeToWaitInMicroseconds = 1000000 * 60 * 5;
+        $maximumTimeToWaitInMicroseconds = 1000000;
         $intervalInMicrosecondsBetweenEachTry = 50000;
         $timeWaitedInMicroseconds = 0;
         do {
@@ -51,7 +56,7 @@ class Requester
             $timeWaitedInMicroseconds
         );
 
-        echo "$message\n";
+        echo "\n$message\n\n";
     }
 
 }

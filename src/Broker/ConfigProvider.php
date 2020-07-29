@@ -47,6 +47,8 @@ class ConfigProvider
             Factory\PDOFactory::PORT => 5432,
             Factory\PDOFactory::USERNAME => 'postgres',
             Factory\PDOFactory::PASSWORD => 'root',
+
+            Factory\PDOFactory::HOW_MANY_CONNECTION_TRIES_BEFORE_FAIL => 0,
         ];
     }
 }

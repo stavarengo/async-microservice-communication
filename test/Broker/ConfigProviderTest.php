@@ -8,6 +8,7 @@ use AMC\Broker\ConfigProvider;
 use AMC\Broker\Factory\PDOFactory;
 use AMC\Broker\Persistence\IDGeneratorInterface;
 use AMC\Broker\Persistence\PersistenceInterface;
+use AMC\Broker\RequestHandler\PostOrPut\PostOrPutHandler;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -26,11 +27,12 @@ class ConfigProviderTest extends TestCase
 
         $config = $configProvider->getContainerDefinitions();
 
-        $this->assertCount(3, $config);
+        $this->assertCount(4, $config);
 
         $this->assertArrayHasKey(PDO::class, $config);
         $this->assertArrayHasKey(PersistenceInterface::class, $config);
         $this->assertArrayHasKey(IDGeneratorInterface::class, $config);
+        $this->assertArrayHasKey(PostOrPutHandler::class, $config);
     }
 
     public function testPDOConfig()
@@ -39,12 +41,13 @@ class ConfigProviderTest extends TestCase
 
         $config = $configProvider->getPDOConfig();
 
-        $this->assertCount(5, $config);
+        $this->assertCount(6, $config);
         $this->assertArrayHasKey(PDOFactory::DRIVE_NAME, $config);
         $this->assertArrayHasKey(PDOFactory::HOSTNAME, $config);
         $this->assertArrayHasKey(PDOFactory::PORT, $config);
         $this->assertArrayHasKey(PDOFactory::USERNAME, $config);
         $this->assertArrayHasKey(PDOFactory::PASSWORD, $config);
+        $this->assertArrayHasKey(PDOFactory::HOW_MANY_CONNECTION_TRIES_BEFORE_FAIL, $config);
     }
 
     public function testInvoke()
